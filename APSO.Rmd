@@ -1,7 +1,7 @@
 
 
 ```{r}
-# PSO PARAMETERS
+# APSO PARAMETERS
 
 maxIter <- 20
 #Populasyon sayısı 40
@@ -12,8 +12,8 @@ Wmin <-0.4 #min weight
 Wmax <- 0.9 #max weight
 Tmax<-2 #maximum generation
 
-# gBest <- fitness functiondan bulunacak
-# Wmax ve Wmin değerleri atanacak
+# gBest <- fitness 
+
 
 #Step1: Initializing population of particles
 xi <- c(runif(n=40, min=0, max=1)) #random position vector
@@ -100,7 +100,7 @@ t <- t +1
  
  new_newVi <- new_W*vi + c1*r1*(pBest-newXi) + c2*r2*(GiBest-newXi) #2.formül
 
- new_newXi <- newXi+ new_newVi #3.formül
+ new_newXi <- newXi+ new_newVi
       
       t <- t + 1
     } 
@@ -124,7 +124,7 @@ if(Gi== 0 & GiBest==0){ #both are feasible solutions
   if(Fi<FiBest){
     pBest <- x_curr
   }
-} else if(Gi >0 & GiBest==0){ #6.satır Gi>0 infeasible
+} else if(Gi >0 & GiBest==0){ #Gi>0 infeasible
   if(Fi < FiBest){
     r <- runif(n = 2, min = 0, max = 1) #8.satır n değişkeni kaç?
     if(r<Pr){
