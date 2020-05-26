@@ -1,0 +1,164 @@
+
+
+```{r}
+# PSO PARAMETERS
+
+maxIter <- 20
+#Populasyon sayısı 40
+c1<-1.49445 #self-cognitive coefficient 
+c2<-1.49445 #social cognitive coefficient
+t<-1 #generation number
+Wmin <-0.4 #min weight
+Wmax <- 0.9 #max weight
+Tmax<-2 #maximum generation
+
+# gBest <- fitness functiondan bulunacak
+# Wmax ve Wmin değerleri atanacak
+
+#Step1: Initializing population of particles
+xi <- c(runif(n=40, min=0, max=1)) #random position vector
+vi <- c(runif(n=40, min=0, max=0)) #random velocity vector, initial value is 0
+
+# xi[1] shows first element in array
+
+#Step2: Calculate Fitness X(t)
+  i<- 1
+  fit_array <- array(numeric(),c(40,1)) 
+#  colnames(fit_array) <- c("Fitness")
+  for (a in xi){
+       x <- xi[i]
+      f_function <- (x^2 + 2*x)
+
+ 
+      fit_array[i]<-f_function
+
+   i<-i+1
+  }
+  
+  
+Xn <- array(c(xi,vi,fit_array),dim = c(40,3)) #population of particles
+colnames(Xn) <- c("Position","Velocity","FitnessVal")
+
+  
+# Find the closest value to 0 (Gi)
+closest_number <- 0
+index_Gi <- which.min(abs(fit_array-closest_number)) # which(abs(fit_array-closest_number)==min(abs(fit_array-closest_number)))
+Gi <- fit_array[index_Gi]
+pBest <- xi  
+
+x_curr <- xi[index_Gi]
+
+  
+  #Finding Fi
+ closest_number <- 0
+ index_Fi <- which.min(abs(fit_array-closest_number))      
+ Fi <- fit_array[index_Fi]
+ FiBest <- (Fi^2 + 2*Fi)
+ 
+# c <-  Closest(fit_array, 0, which = FALSE, na.rm = FALSE)
+  
+#  df <- data.frame(fit_array)
+#  fun(df)
+
+
+#Step3: Update position and velocity of particles
+r1 <- runif(n=40, min=0, max=1) #random numbers between 0 and 1
+r2 <- runif(n=40, min=0, max=1) #random numbers between 0 and 1
+
+ w <- Wmax - (t*(Wmax-Wmin))/Tmax 	# 4.formül 
+
+
+newVi <- w*vi + c1*r1*(pBest-xi) + c2*r2*(Gi-xi) #2.formül
+
+newXi <- xi+ newVi #3.formül
+
+#________________________________________________________2. Iteration
+
+t <- t +1
+
+  while (t !=maxIter) {
+    if(Gi !=0){
+      
+      i<- 1
+  new_fit_array <- array(numeric(),c(40,1)) 
+  colnames(new_fit_array) <- c("New Fitness")
+  for (a in newXi){
+       x <- newXi[i]
+      f_function <- (x^2 + 2*x)
+
+      new_fit_array[i]<-f_function
+
+   i<-i+1
+  }
+ closest_number <- 0
+ index_GiBest <- which.min(abs(new_fit_array-closest_number))      
+ GiBest <- new_fit_array[index_GiBest]
+ pBest <- newXi
+
+ new_W <- Wmax - (t*(Wmax-Wmin))/Tmax 	# 4.formül 
+
+ 
+ new_newVi <- new_W*vi + c1*r1*(pBest-newXi) + c2*r2*(GiBest-newXi) #2.formül
+
+ new_newXi <- newXi+ new_newVi #3.formül
+      
+      t <- t + 1
+    } 
+  }
+#________________________________________________________2.4
+#x_curr <- pBest # current position xith element
+
+#probability formula for accepting infeasible solution
+
+Pr1 <- 0 #Pr1 accepting at the end
+Pr2 <- 0.5 #Pr2 accepting in the beginning
+
+
+#t is number of iteration
+#Tmax is max number of iterations
+Pr <- Pr2 - (t*(Pr2-Pr1)/Tmax)
+
+
+
+if(Gi== 0 & GiBest==0){ #both are feasible solutions
+  if(Fi<FiBest){
+    pBest <- x_curr
+  }
+} else if(Gi >0 & GiBest==0){ #6.satır Gi>0 infeasible
+  if(Fi < FiBest){
+    r <- runif(n = 2, min = 0, max = 1) #8.satır n değişkeni kaç?
+    if(r<Pr){
+      pBest<-x_curr
+    }
+  }
+
+} else if(Gi==0 & GiBest>0){ #GiBest >0 infeasible
+  if(Fi<FiBest){
+    pBest <- x_curr
+  } else {
+    r <- runif(n = 2, min = 0, max = 1) 
+    if(r>Pr){ #18.satır
+      pBest <- x_curr
+    }
+  }
+
+} else if(Gi>0 & GiBest >0){ #22.satır both are infeasible
+  Gmul <- GiBest/Gi 
+  Fmul <- Fi/FiBest
+  if(Fi<FiBest & Gi < GiBest){
+    pBest <- x_curr
+  } else if(Fi>FiBest & Gi< GiBest){ #26.satır
+    if(Gmul>Fmul){
+      pBest <- x_curr
+    }
+  } else if(Fi < FiBest & Gi>GiBest){
+    if(Gmul<Fmul){
+      pBest <- x_curr
+    }
+  }
+}
+
+
+```
+
+
